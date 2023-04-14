@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Define a route that returns a string on a GET request
-@app.route('/')
+@app.route('/', methods=['GET'])
 def return_events():
     test_date = datetime(2023, 7, 4)
     response = {'events': nas_events(test_date)}
