@@ -10,4 +10,4 @@ def format_date(date: str) -> datetime:
     return dt.replace(year=datetime.now().year)
 
 def str_from_key(key) -> str:
-    return key.strftime("%A %B %-d, %-I:%M%p")
+    return key.strftime("%a. %B %-d, %-I:%M%p").lower().capitalize()
