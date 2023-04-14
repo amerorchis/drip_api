@@ -34,6 +34,6 @@ def nas_events(now = datetime.now()):
     # Convert the list back into a string and return it.
     if events_this_week:
         event_str = '|'.join(events_this_week)
-        return "Events this week:|" + event_str
+        return "Native America Speaks Events This Week:|" + event_str
     else:
         return ""
