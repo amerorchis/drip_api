@@ -1,0 +1,1 @@
+This module creates a flask app that can respond to requests from the Drip API to create dynamic liquid content.
