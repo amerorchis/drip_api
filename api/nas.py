@@ -36,4 +36,3 @@ def nas_events(now = datetime.now()):
         return "Events this week:|" + event_str
     else:
         return ""
-
