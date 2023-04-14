@@ -14,5 +14,7 @@ def return_events():
 
 # Define a route that returns a string on a GET request
 @app.route('/', methods=['GET'])
-def return_events():
+def return_index():
     return nas_events(datetime(2023, 7, 4))
+
+app.run()
