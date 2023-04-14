@@ -15,6 +15,8 @@ def return_events():
 # Define a route that returns a string on a GET request
 @app.route('/', methods=['GET'])
 def return_index():
-    return nas_events(datetime(2023, 7, 4))
+    return "Connection established"
 
-app.run()
+@app.route('/nas', methods=['GET'])
+def return_string():
+    return nas_events(datetime(2023, 7, 4)).replace('|', '\n')
