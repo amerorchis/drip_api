@@ -35,5 +35,5 @@ def nas_events(now = datetime.now()):
         event_str = '|'.join(events_this_week)
         return "Events this week:|" + event_str
     else:
-        return "No events"
+        return ""
 
