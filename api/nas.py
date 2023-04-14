@@ -19,7 +19,7 @@ def nas_events(now = datetime.now()):
 
     # Create a dict where each event is stored by its datetime object
     for i in events:
-        details = " ".join(i[1:]).replace(', Evening Program, ', ', ').replace(', Cultural Presentation, ', ', ')
+        details = " ".join(i[1:]).replace(', Evening Program, ', ', ').replace(', Cultural Presentation, ', ', ').replace('Amphitheater', '')
         dt_events[format_date(i[0])] = details
 
     # Create a range from now to a week from now
