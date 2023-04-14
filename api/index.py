@@ -12,7 +12,3 @@ def return_events():
     response = {'events': nas_events(test_date)}
 
     return jsonify(response)
-
-# Start the Flask app
-if __name__ == '__main__':
-    app.run()
