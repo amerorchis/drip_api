@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 # Define a route that returns a JSON on a GET request to /drip
-@app.route('/drip, /drip/', methods=['GET'])
+@app.route('/drip', methods=['GET'])
 def return_events():
     print(request.url)
 
