@@ -8,14 +8,19 @@ app = Flask(__name__)
 # Define a route that returns a JSON on a GET request to /drip
 @app.route('/drip', methods=['GET'])
 def return_events():
-    
+    print(request.url)
+
     # Check if Drip is in test mode.
     test_mode = False
     if request.args: 
         test_mode = True if 'preview' in request.args and request.args['preview'] == 'true' else False
+        print(test_mode)
+    
     day = datetime(2023, 7, 4) if test_mode else datetime.now()
+    print(day)
     
     response = {'events': nas_events(day)}
+    print(response)
     return jsonify(response)
 
 # Define a route that returns a string on a GET request
