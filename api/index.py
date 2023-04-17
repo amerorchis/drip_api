@@ -16,10 +16,11 @@ def return_events():
         test_mode = True if 'preview' in request.args and request.args['preview'] == 'true' else False
         print(test_mode)
     
-    day = datetime(2023, 7, 4) if test_mode else datetime.now()
+    test_day = datetime(2023, 7, 4)
+    day = test_day if test_mode else datetime.now()
     print(day)
     
-    response = {'events': nas_events(day)}
+    response = {'events': nas_events(day), 'test_events': nas_events(test_day)}
     print(response)
     return jsonify(response)
 
