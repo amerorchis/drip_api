@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from dripAPI.nas import nas_events
+from api.nas import nas_events
 from datetime import datetime
 
 # Create a Flask app instance
