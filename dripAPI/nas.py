@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from api.nas_mods import *
+from dripAPI.nas_mods import *
 
 def nas_events(now = datetime.now()):
 
