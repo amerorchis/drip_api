@@ -1,3 +1,6 @@
 /__pycache__
 /drip_api
 /api/__pycache__/
+.env
+__init__.__pycache__
+*old*

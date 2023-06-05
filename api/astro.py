@@ -1,0 +1,2 @@
+def astro(day):
+    return ""
