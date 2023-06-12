@@ -3,3 +3,4 @@
 /api/__pycache__/
 .env
 __init__.__pycache__
+test.py

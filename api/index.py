@@ -1,10 +1,9 @@
 from flask import Flask, jsonify, request
-from api.nas import nas_events
-from api.astro import astro
-from api.daily import daily
+from api.events import events
 import api.nas_old
 from datetime import datetime
 import api.drip as drip
+import time
 
 # Create a Flask app instance
 app = Flask(__name__)
@@ -12,32 +11,21 @@ app = Flask(__name__)
 # Define a route that returns a JSON on a GET request to /drip
 @app.route('/drip', methods=['GET'])
 def return_events():
-    print(request.url)
-    test_mode, field = False, False
+    start_time = time.time()
+    test_mode = False
 
     # Parse args
     if request.args:
         # Check if Drip is in test mode.
         if 'preview' in request.args:
             test_mode = True if 'preview' in request.args and request.args['preview'] == 'true' else False
-
-        if 'event' in request.args:
-            field = request.args['event']
-        print(test_mode, field)
     
     day = datetime(2023, 7, 4) if test_mode else datetime.now()
 
-    if field == 'nas':
-        return jsonify({'events': nas_events(day)})
-    
-    elif field == 'astro':
-        return astro(day)
-    
-    elif field == 'internal':
-        return daily()
+    result = events(day)
+    print(f'Elapsed: {time.time() - start_time} seconds')
 
-    else:
-        return 'No field selected.'
+    return result
     
 # Define a route that returns a string on a GET request
 @app.route('/', methods=['GET'])
