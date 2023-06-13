@@ -1,16 +1,23 @@
-from flask import Flask, jsonify, request, abort, g
-from flask_caching import Cache
-from api.events import events
-from datetime import datetime
-import api.drip as drip
-import time
-from api.cache_timing import get_remaining_time
+import os
 import threading
+import time
+from datetime import datetime
 
-config = {
-    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
-    "CACHE_DEFAULT_TIMEOUT": 300
-}
+from flask import Flask, abort, jsonify, request
+from flask_caching import Cache
+
+import api.drip as drip
+from api.cache_timing import get_remaining_time
+from api.events import events
+
+redis_host = os.environ.get('REDIS_HOST')
+redis_password = os.environ.get('REDIS_PASSWORD')
+redis_port = os.environ.get('REDIS_PORT')
+
+config={'CACHE_TYPE': 'RedisCache',
+        'CACHE_REDIS_HOST': redis_host,
+        'CACHE_REDIS_PORT': redis_port,
+        'CACHE_REDIS_PASSWORD': redis_password}
 
 # Create a Flask app instance
 app = Flask(__name__)

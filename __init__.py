@@ -1,3 +1,4 @@
 import api.index
 
-api.index.app.run(port=5001)
+if __name__ == "__main__":
+    api.index.app.run(port=5001)
