@@ -1,5 +1,15 @@
 {
     "rewrites": [
       { "source": "/(.*)", "destination": "/api/index" }
+    ],
+    "headers": [
+      {
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "s-maxage=21600, stale-while-revalidate=59"
+          }
+        ]
+      }
     ]
   }
