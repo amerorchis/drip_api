@@ -31,4 +31,4 @@ class Event:
         if '-' in self.title:
             self.title = self.title.split(' - ')[1]
         self.title = self.title.replace(' (Apgar)','').replace(' (St. Mary)','')
-        self.title = self.title.replace('Half the Park Happens After Dark', 'Astronomy Program')
+        self.title = self.title.replace('Half the Park Happens After Dark', 'Astronomy')
