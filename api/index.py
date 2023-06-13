@@ -61,8 +61,7 @@ def return_events():
     
     else:
         print('No cache found, initiate threading.')
-        threading.Thread(target=async_data, args=[day, test_mode]).start()
-        threading.Thread(target=handle_429).start
+        async_data(day, test_mode)
         return jsonify({'error':'429 - Data is being retrieved. Please try again in a minute.'}), 429
     
 @app.route('/drip/clear')
