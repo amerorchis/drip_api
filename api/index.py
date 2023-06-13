@@ -64,7 +64,7 @@ def return_events():
     else:
         print('No cache found, initiate threading.')
         async_data(day, test_mode)
-        print('New cache made; time elapsed: {time.time() - start_time} seconds')
+        print(f'New cache made; time elapsed: {time.time() - start_time} seconds')
         return jsonify(cached_data)
     
 @app.route('/drip/clear')
