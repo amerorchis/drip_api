@@ -52,4 +52,4 @@ def events(now = datetime.now()):
             event_str.append(i.__str__())
         return '|'.join(event_str)
     
-    return jsonify({'nas': stringify_events(nas_events), 'astro':stringify_events(astro_events)})
+    return {'nas': stringify_events(nas_events), 'astro':stringify_events(astro_events)}
