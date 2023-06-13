@@ -52,4 +52,4 @@ def events(now = datetime.now()):
             event_str.append(i.__str__())
         return '|'.join(event_str)
     
-    return {'nas': stringify_events(nas_events), 'astro':stringify_events(astro_events)}
+    return {'nas': stringify_events(nas_events), 'astro':stringify_events(astro_events), 'test': 'The API is reading plain text.'}
