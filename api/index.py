@@ -36,6 +36,7 @@ def handle_429():
 
 # Define a route that returns a JSON on a GET request to /drip
 @app.route('/drip', methods=['GET'])
+@app.route('/drip/', methods=['GET'])
 def return_events():
     start_time = time.time()
     test_mode = False
