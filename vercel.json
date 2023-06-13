@@ -4,6 +4,7 @@
     ],
     "headers": [
       {
+        "source": "/api/index",
         "headers": [
           {
             "key": "Cache-Control",
