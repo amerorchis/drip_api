@@ -22,7 +22,7 @@ class Event:
         loc = loc.split('(')[0]
         loc = loc.replace(' Amphitheater', '')
         loc = loc.replace('Lucerne Room', '')
-        loc = loc.replace(', Lake McDonald Valley', '').replace(', St. Mary Valley', '')
+        loc = loc.replace(', Lake McDonald Valley', '').replace(', St. Mary Valley', '').replace(', Many Glacier Valley', '')
         while loc[-1] == ' ':
             loc = loc[:-1]
         self.location = loc
@@ -31,3 +31,4 @@ class Event:
         if '-' in self.title:
             self.title = self.title.split(' - ')[1]
         self.title = self.title.replace(' (Apgar)','').replace(' (St. Mary)','')
+        self.title = self.title.replace('Half the Park Happens After Dark', 'Astronomy Program')

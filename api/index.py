@@ -49,6 +49,7 @@ def return_events():
     
     if test_mode:
         day = datetime(2023, 7, 4)
+        print('Operating in test mode.')
         cached_data = cache.get('cached_test_events')
 
     else:
@@ -63,7 +64,8 @@ def return_events():
     else:
         print('No cache found, initiate threading.')
         async_data(day, test_mode)
-        return jsonify({'error':'429 - Data is being retrieved. Please try again in a minute.'}), 429
+        print('New cache made; time elapsed: {time.time() - start_time} seconds')
+        return jsonify(cached_data)
     
 @app.route('/drip/clear')
 def clear_cache():
