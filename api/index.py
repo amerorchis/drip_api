@@ -24,15 +24,17 @@ app = Flask(__name__)
 app.config.from_mapping(config)
 cache = Cache(app)
 
-def async_data(day, test = False):
+def async_data(day = datetime.now(), test = False):
+    print('about to set cache')
     cache_name = 'cached_test_events' if test else 'cached_events'
-    cache.set(cache_name, events(day), timeout=get_remaining_time())
+    data = events(day)
+    cache.set(cache_name, data, timeout=get_remaining_time())
+    print(f'cache set with: \n{data}')
 
 def handle_429():
     abort(429)
 
 # Define a route that returns a JSON on a GET request to /drip
-@cache.cached()
 @app.route('/drip', methods=['GET'])
 def return_events():
     start_time = time.time()
@@ -58,9 +60,28 @@ def return_events():
         return jsonify(cached_data)
     
     else:
-        threading.Thread(target=handle_429).start
+        print('No cache found, initiate threading.')
         threading.Thread(target=async_data, args=[day, test_mode]).start()
-        return 'Data is being retrieved. Please try again in a minute.', 429
+        threading.Thread(target=handle_429).start
+        return jsonify({'error':'429 - Data is being retrieved. Please try again in a minute.'}), 429
+    
+@app.route('/drip/clear')
+def clear_cache():
+    cache.clear()
+    print('Cache cleared')
+    return 'Cache cleared'
+
+@app.route('/drip/set_test_cache')
+def set_test_cache():
+    print('setting test cache')
+    cache.set('test_cache', 'You have retrieved test cache data.', timeout=300)
+    return 'Test cache set.'
+
+@app.route('/drip/get_test_cache')
+def get_test_cache():
+    print('getting test cache')
+    data = cache.get('test_cache') if cache.get('test_cache') else 'There was no test cache data retrieved.'
+    return data
     
 # Define a route that returns a string on a GET request
 @app.route('/', methods=['GET'])
