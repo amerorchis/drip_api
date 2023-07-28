@@ -101,5 +101,8 @@ def drip_actions():
         return drip.stopdaily(email)
     elif action == 'unsub':
         return drip.unsub(email)
+    elif action == 'optout':
+        tag = request.args.get('tag')
+        return drip.untag(email, tag)
     else:
         return "No action was specified."

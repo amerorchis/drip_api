@@ -6,3 +6,4 @@ __init__.__pycache__
 test.py
 make_cache.py
 todo
+.DS_Store
