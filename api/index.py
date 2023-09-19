@@ -106,7 +106,7 @@ def drip_actions():
         return drip.untag(email, tag)
     elif action == 'untilspring':
         remove = drip.stopdaily(email)
-        add = drip.tag(email, 'Resume%20Daily%20Spring')
+        add = drip.tag(email, 'Resume Daily Spring')
         if "Error" not in remove and "Error" not in add:
             return "You have been removed from Daily Updates until spring."
     else:
