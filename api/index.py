@@ -104,5 +104,10 @@ def drip_actions():
     elif action == 'optout':
         tag = request.args.get('tag')
         return drip.untag(email, tag)
+    elif action == 'untilspring':
+        remove = drip.stopdaily(email)
+        add = drip.tag(email, 'Resume%20Daily%20Spring')
+        if "Error" not in remove and "Error" not in add:
+            return "You have been removed from Daily Updates until spring."
     else:
         return "No action was specified."

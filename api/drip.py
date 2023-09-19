@@ -76,3 +76,39 @@ def unsub(email):
     except requests.exceptions.RequestException as e:
         # Handle errors
         return f"Error: {e}"
+
+def tag(email, tag):
+    email = urllib.parse.quote(email, safe='@')
+    drip_token = os.environ['DRIP_TOKEN']
+    account_id = os.environ['DRIP_ACCOUNT']
+    api_key = drip_token
+
+    headers = {
+        "Authorization": "Bearer " + api_key,
+        "Content-Type": "application/vnd.api+json"
+    }
+
+    url = f'https://api.getdrip.com/v2/{account_id}/tags'
+
+    payload= { 
+        "tags": [{ 
+            "email": email, 
+            "tag": tag
+        }] 
+    }
+
+    try:
+        data = json.dumps(payload)
+        response = requests.post(url, headers=headers, data=data)
+        response.raise_for_status()
+        if response.status_code == 201:
+            return f"{email} was tagged {tag}."
+        else:
+            print(response.reason)
+            return f'Error Response Code: {response.status_code}'
+    except requests.exceptions.RequestException as e:
+        # Handle errors
+        return f"Error: {e}"
+
+if __name__ == "__main__":
+    print(tag('andrew@glacier.org', 'DA test'))

@@ -7,3 +7,4 @@ test.py
 make_cache.py
 todo
 .DS_Store
+env.sh
