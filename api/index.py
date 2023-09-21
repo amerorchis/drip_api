@@ -109,5 +109,7 @@ def drip_actions():
         add = drip.tag(email, 'Resume Daily Spring')
         if "Error" not in remove and "Error" not in add:
             return "You have been removed from Daily Updates until spring."
+    elif action == 'startdaily':
+        return drip.tag(email, 'Glacier Daily Update')
     else:
         return "No action was specified."
