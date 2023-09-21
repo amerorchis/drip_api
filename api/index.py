@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 
 from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
 from flask_caching import Cache
 
 import api.drip as drip
@@ -23,6 +24,7 @@ config={'CACHE_TYPE': 'RedisCache',
 app = Flask(__name__)
 app.config.from_mapping(config)
 cache = Cache(app)
+cors = CORS(app, resources={r"/dripactions": {"origins": "https://glacier.org"}})
 
 def async_data(day = datetime.now(), test = False):
     print('about to set cache')
@@ -90,7 +92,7 @@ def get_test_cache():
 def return_index():
     return "Connection established"
 
-@app.route('/dripactions', methods=['GET'])
+@app.route('/dripactions', methods=['GET', 'POST'])
 def drip_actions():
     try:
         action, email = request.args['action'], request.args['email']
