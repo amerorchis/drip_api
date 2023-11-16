@@ -16,7 +16,7 @@ def daily(args: dict):
     custom_fields = {}
 
     # If the start date is today or earlier tag and add immediately
-    if dt_start <= now or not start:
+    if not start or dt_start <= now:
         tags.append("Glacier Daily Update")
 
         # If it's already gone out today, add them to the workflow now.
