@@ -10,6 +10,7 @@ from flask_caching import Cache
 import api.drip as drip
 from api.cache_timing import get_remaining_time
 from api.events import events
+from api.daily import daily
 
 redis_host = os.environ.get('REDIS_HOST')
 redis_password = os.environ.get('REDIS_PASSWORD')
@@ -101,17 +102,28 @@ def drip_actions():
     
     if action == 'stopdaily':
         return drip.stopdaily(email)
+    
     elif action == 'unsub':
         return drip.unsub(email)
+    
     elif action == 'optout':
         tag = request.args.get('tag')
         return drip.untag(email, tag)
+    
     elif action == 'untilspring':
         remove = drip.stopdaily(email)
         add = drip.tag(email, 'Resume Daily Spring')
         if "Error" not in remove and "Error" not in add:
             return "You have been removed from Daily Updates until spring."
+        
     elif action == 'startdaily':
-        return drip.tag(email, 'Glacier Daily Update')
+        resp = daily(request.args)
+
+        if resp:
+            return(resp)
+        
+        else:
+            abort(500)
+    
     else:
         return "No action was specified."

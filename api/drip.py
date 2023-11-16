@@ -110,5 +110,52 @@ def tag(email, tag):
         # Handle errors
         return f"Error: {e}"
 
+def add_to_workflow(email, campaign_id):
+    email = urllib.parse.quote(email, safe='@')
+    drip_token = os.environ['DRIP_TOKEN']
+    account_id = os.environ['DRIP_ACCOUNT']
+    api_key = drip_token
+
+    url = f"https://api.getdrip.com/v2/{account_id}/workflows/{campaign_id}/subscribers"
+    headers = {
+        "Authorization": "Bearer " + api_key,
+        "Content-Type": "application/vnd.api+json"
+    }
+
+    data = {
+        "subscribers": [{
+            "email": email,
+        }]
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    r = response.json()
+    
+    if response.status_code == 201:
+        print(f'Drip: Email sent successfully to {email}!')
+        return True
+    
+    else:
+        print(f"Failed to subscribe {email} to the campaign. Error message:", r["errors"][0]["code"], ' - ', r["errors"][0]["message"])
+
+def custom_field(email, custom_fields: dict):
+    email = urllib.parse.quote(email, safe='@')
+    drip_token = os.environ['DRIP_TOKEN']
+    account_id = os.environ['DRIP_ACCOUNT']
+    api_key = drip_token
+    url = f"https://api.getdrip.com/v2/{account_id}/subscribers"
+
+    headers = {
+        "Authorization": "Bearer " + api_key,
+        "Content-Type": "application/vnd.api+json"
+    }
+
+    data = {
+        "subscribers": [{
+            "email": email,
+            "custom_fields": custom_fields
+        }]
+    }
+
 if __name__ == "__main__":
     print(tag('andrew@glacier.org', 'DA test'))
