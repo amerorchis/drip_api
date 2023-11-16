@@ -12,11 +12,12 @@ def daily(args: dict):
         dt_start = datetime.strptime(start, "%Y-%m-%d")
 
     updates = {"email": email}
+    tags = []
     custom_fields = {}
 
     # If the start date is today or earlier tag and add immediately
     if dt_start <= now or not start:
-        updates['tags'] = ["Glacier Daily Update"]
+        tags.append("Glacier Daily Update")
 
         # If it's already gone out today, add them to the workflow now.
         if now.hour > 8:
@@ -28,12 +29,16 @@ def daily(args: dict):
     # If start is in the future, store it in Drip.
     else:
         custom_fields['Daily_Start'] = start
+        tags.append('Daily Start Set')
+        
     
     if end:
         custom_fields['Daily_End'] = end
+        tags.append('Daily End Set')
 
     # Store values in account
     updates["custom_fields"] = custom_fields
+    updates["tags"] = tags
 
     email = urllib.parse.quote(email, safe='@')
     drip_token = os.environ['DRIP_TOKEN']
