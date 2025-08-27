@@ -7,7 +7,7 @@ def nas_events(now = datetime.now()):
 
     # Pull site and grab elements with event data
     r = requests.get('https://www.nps.gov/glac/planyourvisit/nas.htm')
-    soup = BeautifulSoup(r.content, features='lxml')
+    soup = BeautifulSoup(r.content, 'html.parser')
     accords = soup.find_all("div", class_="accordion-collapse")
 
     # Extract the relevant text and save it in a list
