@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+.pytest_cache/
+
+# Virtual environments
+.venv
+/drip_api
+
+# Secrets and local config
+.env
+env.sh
+.vercel
+
+# Local notes
+todo
+CLAUDE.md
+
+# OS
+.DS_Store

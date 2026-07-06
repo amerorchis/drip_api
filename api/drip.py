@@ -3,149 +3,59 @@ import os
 import json
 import urllib.parse
 
-def stopdaily(email):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-    tag = 'Glacier%20Daily%20Update'
-    url = f"https://api.getdrip.com/v2/{account_id}/subscribers/{email}/tags/{tag}"
-
-    headers = {
-        "Authorization": "Bearer " + api_key,
+def _headers():
+    return {
+        "Authorization": "Bearer " + os.environ['DRIP_TOKEN'],
         "Content-Type": "application/vnd.api+json"
     }
 
+def _account_id():
+    return os.environ['DRIP_ACCOUNT']
+
+def _request(method, url, error_message, **kwargs):
     try:
-        response = requests.delete(url, headers=headers)
+        response = requests.request(method, url, headers=_headers(), **kwargs)
         response.raise_for_status()
-        if response.status_code == 204:
-            return f"{email} was succesfully removed from Glacier Daily Updates"
-        else:
-            print(response.reason)
-            return f'Error Response Code: {response.status_code}'
+        return None
     except requests.exceptions.RequestException as e:
-        # Handle errors
-        return f"Error: {e}"
-
-def stopsunset(email):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-    tag = 'Sunset%20Timelapse'
-    url = f"https://api.getdrip.com/v2/{account_id}/subscribers/{email}/tags/{tag}"
-
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
-
-    try:
-        response = requests.delete(url, headers=headers)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return f"{email} was succesfully removed from Sunset Timelapse"
-        else:
-            print(response.reason)
-            return f'Error Response Code: {response.status_code}'
-    except requests.exceptions.RequestException as e:
-        # Handle errors
-        return f"Error: {e}"
+        return f"{error_message} Error: {e}"
 
 def untag(email, tag):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-    url = f"https://api.getdrip.com/v2/{account_id}/subscribers/{email}/tags/{tag}"
+    encoded_email = urllib.parse.quote(email, safe='@')
+    encoded_tag = urllib.parse.quote(tag)
+    url = f"https://api.getdrip.com/v2/{_account_id()}/subscribers/{encoded_email}/tags/{encoded_tag}"
 
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
-
-    try:
-        response = requests.delete(url, headers=headers)
-        response.raise_for_status()
-        if response.status_code == 204:
-            return f"{email} was succesfully removed from {tag}."
-        else:
-            print(response.reason)
-            return f'Error Response Code: {response.status_code}'
-    except requests.exceptions.RequestException as e:
-        # Handle errors
-        return f"Error: {e}. Opt out failed."
-
-def unsub(email):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-    tag = 'Glacier%20Daily%20Update'
-    url = f"https://api.getdrip.com/v2/{account_id}/subscribers/{email}/unsubscribe_all"
-
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
-
-    try:
-        response = requests.post(url, headers=headers)
-        response.raise_for_status()
-        if response.status_code == 200:
-            return f"{email} was unsubscribed from all marketing."
-        else:
-            print(response.reason)
-            return f'Error Response Code: {response.status_code}'
-    except requests.exceptions.RequestException as e:
-        # Handle errors
-        return f"Error: {e}"
+    error = _request('DELETE', url, f"Could not remove {email} from {tag}.")
+    if error:
+        return error, 502
+    return f"{email} was successfully removed from {tag}.", 200
 
 def tag(email, tag):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
+    url = f"https://api.getdrip.com/v2/{_account_id()}/tags"
 
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
-
-    url = f'https://api.getdrip.com/v2/{account_id}/tags'
-
-    payload= { 
-        "tags": [{ 
-            "email": email, 
+    payload = {
+        "tags": [{
+            "email": email,
             "tag": tag
-        }] 
+        }]
     }
 
-    try:
-        data = json.dumps(payload)
-        response = requests.post(url, headers=headers, data=data)
-        response.raise_for_status()
-        if response.status_code == 201:
-            return f"{email} was tagged {tag}."
-        else:
-            print(response.reason)
-            return f'Error Response Code: {response.status_code}'
-    except requests.exceptions.RequestException as e:
-        # Handle errors
-        return f"Error: {e}"
+    error = _request('POST', url, f"Could not tag {email} with {tag}.", data=json.dumps(payload))
+    if error:
+        return error, 502
+    return f"{email} was tagged {tag}.", 200
+
+def unsub(email):
+    encoded_email = urllib.parse.quote(email, safe='@')
+    url = f"https://api.getdrip.com/v2/{_account_id()}/subscribers/{encoded_email}/unsubscribe_all"
+
+    error = _request('POST', url, f"Could not unsubscribe {email}.")
+    if error:
+        return error, 502
+    return f"{email} was unsubscribed from all marketing.", 200
 
 def add_to_workflow(email, campaign_id):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-
-    url = f"https://api.getdrip.com/v2/{account_id}/workflows/{campaign_id}/subscribers"
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
+    url = f"https://api.getdrip.com/v2/{_account_id()}/workflows/{campaign_id}/subscribers"
 
     data = {
         "subscribers": [{
@@ -153,34 +63,12 @@ def add_to_workflow(email, campaign_id):
         }]
     }
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response = requests.post(url, headers=_headers(), data=json.dumps(data))
     r = response.json()
-    
+
     if response.status_code == 201:
         print(f'Drip: Email sent successfully to {email}!')
         return True
-    
+
     else:
         print(f"Failed to subscribe {email} to the campaign. Error message:", r["errors"][0]["code"], ' - ', r["errors"][0]["message"])
-
-def custom_field(email, custom_fields: dict):
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
-    account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
-    url = f"https://api.getdrip.com/v2/{account_id}/subscribers"
-
-    headers = {
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/vnd.api+json"
-    }
-
-    data = {
-        "subscribers": [{
-            "email": email,
-            "custom_fields": custom_fields
-        }]
-    }
-
-if __name__ == "__main__":
-    print(tag('andrew@glacier.org', 'DA test'))

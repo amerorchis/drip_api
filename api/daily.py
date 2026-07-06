@@ -1,15 +1,23 @@
-from api.drip import *
-
+import os
+import json
 from datetime import datetime
+
+import pytz
+import requests
+
+from api.drip import add_to_workflow
 
 def daily(args: dict):
     email, start, end = args.get('email'), args.get('start'), args.get('end')
 
-    now = datetime.now()
+    now = datetime.now(pytz.timezone('US/Mountain')).replace(tzinfo=None)
 
     dt_start = None
     if start:
-        dt_start = datetime.strptime(start, "%Y-%m-%d")
+        try:
+            dt_start = datetime.strptime(start, "%Y-%m-%d")
+        except ValueError:
+            return "The start date was not in the expected YYYY-MM-DD format.", 400
 
     updates = {"email": email}
     tags = []
@@ -30,8 +38,8 @@ def daily(args: dict):
     else:
         custom_fields['Daily_Start'] = start
         tags.append('Daily Start Set')
-        
-    
+
+
     if end:
         custom_fields['Daily_End'] = end
         tags.append('Daily End Set')
@@ -40,14 +48,11 @@ def daily(args: dict):
     updates["custom_fields"] = custom_fields
     updates["tags"] = tags
 
-    email = urllib.parse.quote(email, safe='@')
-    drip_token = os.environ['DRIP_TOKEN']
     account_id = os.environ['DRIP_ACCOUNT']
-    api_key = drip_token
     url = f"https://api.getdrip.com/v2/{account_id}/subscribers"
 
     headers = {
-        "Authorization": "Bearer " + api_key,
+        "Authorization": "Bearer " + os.environ['DRIP_TOKEN'],
         "Content-Type": "application/vnd.api+json"
     }
 
@@ -55,14 +60,17 @@ def daily(args: dict):
         "subscribers": [updates]
     }
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    r = response.json()
-    
-    if response.status_code == 200:
-        print(f'Drip: {email} was updated!')
-        return f"{email} was successfully added/scheduled."
-    
-    else:
-        print(f"Failed to subscribe {email} to the campaign. Error message:", r["errors"][0]["code"], ' - ', r["errors"][0]["message"])
-        return False
-        
+    try:
+        response = requests.post(url, headers=headers, data=json.dumps(data))
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        try:
+            r = response.json()
+            detail = r["errors"][0]["message"]
+        except Exception:
+            detail = str(e)
+        print(f"Failed to subscribe {email} to the campaign. Error message:", detail)
+        return f"Could not schedule {email}. Error: {detail}", 502
+
+    print(f'Drip: {email} was updated!')
+    return f"{email} was successfully added/scheduled.", 200
