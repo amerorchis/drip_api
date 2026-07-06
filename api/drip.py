@@ -28,6 +28,31 @@ def stopdaily(email):
         # Handle errors
         return f"Error: {e}"
 
+def stopsunset(email):
+    email = urllib.parse.quote(email, safe='@')
+    drip_token = os.environ['DRIP_TOKEN']
+    account_id = os.environ['DRIP_ACCOUNT']
+    api_key = drip_token
+    tag = 'Sunset%20Timelapse'
+    url = f"https://api.getdrip.com/v2/{account_id}/subscribers/{email}/tags/{tag}"
+
+    headers = {
+        "Authorization": "Bearer " + api_key,
+        "Content-Type": "application/vnd.api+json"
+    }
+
+    try:
+        response = requests.delete(url, headers=headers)
+        response.raise_for_status()
+        if response.status_code == 204:
+            return f"{email} was succesfully removed from Sunset Timelapse"
+        else:
+            print(response.reason)
+            return f'Error Response Code: {response.status_code}'
+    except requests.exceptions.RequestException as e:
+        # Handle errors
+        return f"Error: {e}"
+
 def untag(email, tag):
     email = urllib.parse.quote(email, safe='@')
     drip_token = os.environ['DRIP_TOKEN']

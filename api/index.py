@@ -102,7 +102,10 @@ def drip_actions():
     
     if action == 'stopdaily':
         return drip.stopdaily(email)
-    
+
+    elif action == 'stopsunset':
+        return drip.stopsunset(email)
+
     elif action == 'unsub':
         return drip.unsub(email)
     
