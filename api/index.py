@@ -106,6 +106,9 @@ def drip_actions():
     elif action == 'stopsunset':
         return drip.stopsunset(email)
 
+    elif action == 'startsunset':
+        return drip.tag(email, 'Sunset Timelapse')
+
     elif action == 'unsub':
         return drip.unsub(email)
     
