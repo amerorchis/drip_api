@@ -43,6 +43,28 @@ def test_tag_payload_contains_raw_email_not_encoded():
     assert payload['tags'][0]['email'] == 'user+test@example.com'
 
 
+def test_subscribe_posts_to_subscribers_endpoint_with_tags():
+    with patch('api.drip.requests.request') as mock_request:
+        mock_request.return_value = _ok_response()
+        message, status = drip.subscribe('user+test@example.com', ['Sunset Timelapse'])
+
+    assert status == 200
+    url = mock_request.call_args[0][1]
+    assert url.endswith('/subscribers')
+    payload = json.loads(mock_request.call_args[1]['data'])
+    assert payload['subscribers'][0]['email'] == 'user+test@example.com'
+    assert payload['subscribers'][0]['tags'] == ['Sunset Timelapse']
+    assert payload['subscribers'][0]['status'] == 'active'
+
+
+def test_subscribe_request_exception_returns_502():
+    with patch('api.drip.requests.request', side_effect=requests.exceptions.RequestException('down')):
+        message, status = drip.subscribe('test@example.com', ['Sunset Timelapse'])
+
+    assert status == 502
+    assert message
+
+
 def test_unsub_success():
     with patch('api.drip.requests.request') as mock_request:
         mock_request.return_value = _ok_response()

@@ -45,6 +45,27 @@ def tag(email, tag):
         return error, 502
     return f"{email} was tagged {tag}.", 200
 
+def subscribe(email, tags):
+    """Create the subscriber if they don't exist yet, then apply the tags."""
+    url = f"https://api.getdrip.com/v2/{_account_id()}/subscribers"
+
+    payload = {
+        "subscribers": [{
+            "email": email,
+            "tags": tags,
+            # Reactivates anyone who previously unsubscribed, since this action
+            # is only triggered by the subscriber signing up again themselves.
+            "status": "active"
+        }]
+    }
+
+    tag_list = ', '.join(tags)
+    error = _request('POST', url, f"Could not subscribe {email} to {tag_list}.",
+                     data=json.dumps(payload))
+    if error:
+        return error, 502
+    return f"{email} was subscribed to {tag_list}.", 200
+
 def unsub(email):
     encoded_email = urllib.parse.quote(email, safe='@')
     url = f"https://api.getdrip.com/v2/{_account_id()}/subscribers/{encoded_email}/unsubscribe_all"

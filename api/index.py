@@ -145,7 +145,7 @@ def drip_actions():
     actions = {
         'stopdaily': lambda: drip.untag(email, 'Glacier Daily Update'),
         'stopsunset': lambda: drip.untag(email, 'Sunset Timelapse'),
-        'startsunset': lambda: drip.tag(email, 'Sunset Timelapse'),
+        'startsunset': lambda: drip.subscribe(email, ['Sunset Timelapse']),
         'unsub': lambda: drip.unsub(email),
         'optout': optout,
         'untilspring': untilspring,
