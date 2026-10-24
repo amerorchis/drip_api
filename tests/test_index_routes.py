@@ -8,81 +8,6 @@ def test_root_returns_connection_established(client):
     assert resp.get_data(as_text=True) == "Connection established"
 
 
-def test_drip_cache_hit_returns_cached_json(client, mock_cache):
-    cached = {'nas': 'a', 'astro': 'b', 'test': 'c'}
-    mock_cache.get.return_value = cached
-
-    resp = client.get('/drip')
-
-    assert resp.status_code == 200
-    assert resp.get_json() == cached
-    mock_cache.get.assert_called_with('cached_events')
-
-
-def test_drip_cache_miss_returns_fresh_data_not_null(client, mock_cache, monkeypatch):
-    # Headline bug regression: on a cache miss, /drip used to return null.
-    mock_cache.get.return_value = None
-    fresh_data = {'nas': 'nas-events', 'astro': 'astro-events', 'test': 'The API is reading plain text.'}
-    monkeypatch.setattr('api.index.events', lambda day: fresh_data)
-
-    resp = client.get('/drip')
-
-    assert resp.status_code == 200
-    body = resp.get_json()
-    assert body is not None
-    assert body == fresh_data
-    mock_cache.set.assert_called_once()
-    set_args = mock_cache.set.call_args
-    assert set_args[0][0] == 'cached_events'
-    assert set_args[0][1] == fresh_data
-
-
-def test_drip_cache_miss_with_events_error_returns_502(client, mock_cache, monkeypatch):
-    mock_cache.get.return_value = None
-
-    def boom(day):
-        raise RuntimeError('NPS API is down')
-
-    monkeypatch.setattr('api.index.events', boom)
-
-    resp = client.get('/drip')
-
-    assert resp.status_code == 502
-    assert resp.get_json() == {'error': 'Could not fetch events data.'}
-
-
-def test_drip_preview_uses_test_cache_key(client, mock_cache):
-    cached = {'nas': 'x', 'astro': 'y', 'test': 'z'}
-    mock_cache.get.return_value = cached
-
-    resp = client.get('/drip?preview=true')
-
-    assert resp.status_code == 200
-    assert resp.get_json() == cached
-    mock_cache.get.assert_called_with('cached_test_events')
-
-
-def test_drip_preview_cache_miss_uses_fixed_test_date(client, mock_cache, monkeypatch):
-    mock_cache.get.return_value = None
-    captured_days = []
-
-    def fake_events(day):
-        captured_days.append(day)
-        return {'nas': '', 'astro': '', 'test': 'The API is reading plain text.'}
-
-    monkeypatch.setattr('api.index.events', fake_events)
-
-    resp = client.get('/drip?preview=true')
-
-    assert resp.status_code == 200
-    mock_cache.get.assert_called_with('cached_test_events')
-    mock_cache.set.assert_called_once()
-    assert mock_cache.set.call_args[0][0] == 'cached_test_events'
-    assert len(captured_days) == 1
-    from datetime import datetime
-    assert captured_days[0] == datetime(2023, 7, 4)
-
-
 def test_dripactions_missing_action_and_email_returns_400(client):
     resp = client.get('/dripactions')
     assert resp.status_code == 400
@@ -138,8 +63,16 @@ def test_dripactions_untilspring_partial_failure_returns_502_with_message(client
     assert body.strip() != ""
 
 
-def test_test_cache_routes_are_gone(client, mock_cache):
-    # These debug routes wrote to the shared cache with no auth or rate limit.
-    assert client.get('/drip/set_test_cache').status_code == 404
-    assert client.get('/drip/get_test_cache').status_code == 404
-    mock_cache.set.assert_not_called()
+def test_drip_feed_routes_are_gone(client):
+    # The Liquid content feed and its cache routes were retired; nothing calls them.
+    for path in ('/drip', '/drip/', '/drip/clear', '/drip/set_test_cache', '/drip/get_test_cache'):
+        assert client.get(path).status_code == 404, path
+
+
+def test_responses_are_not_cdn_cacheable(client):
+    # vercel.json used to send s-maxage=21600 on every route, which let the CDN
+    # serve a cached /dripactions response instead of running the action.
+    import json
+    import pathlib
+    config = json.loads((pathlib.Path(__file__).parent.parent / 'vercel.json').read_text())
+    assert 'headers' not in config

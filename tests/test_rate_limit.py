@@ -23,11 +23,3 @@ def test_rate_limit_is_per_client_ip(client):
         resp = client.get('/dripactions?action=stopdaily&email=a@b.com',
                           headers={'x-real-ip': '203.0.113.2'})
         assert resp.status_code == 200
-
-
-def test_clear_cache_rate_limited_after_three_per_hour(client, mock_cache):
-    for _ in range(3):
-        resp = client.get('/drip/clear')
-        assert resp.status_code == 200
-    resp = client.get('/drip/clear')
-    assert resp.status_code == 429

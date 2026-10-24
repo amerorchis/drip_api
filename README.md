@@ -1,4 +1,4 @@
-This module creates a flask app that can respond to requests from the Drip API to create dynamic liquid content.
+Flask app behind api.glacier.org/dripactions: subscribe, stop and pause actions for Glacier Daily and Sunset Timelapse emails in Drip.
 
 ## Usage
 
