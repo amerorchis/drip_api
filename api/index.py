@@ -104,18 +104,6 @@ def clear_cache():
     print('Cache cleared')
     return 'Cache cleared'
 
-@app.route('/drip/set_test_cache')
-def set_test_cache():
-    print('setting test cache')
-    cache.set('test_cache', 'You have retrieved test cache data.', timeout=300)
-    return 'Test cache set.'
-
-@app.route('/drip/get_test_cache')
-def get_test_cache():
-    print('getting test cache')
-    data = cache.get('test_cache') if cache.get('test_cache') else 'There was no test cache data retrieved.'
-    return data
-    
 # Define a route that returns a string on a GET request
 @app.route('/', methods=['GET'])
 def return_index():
