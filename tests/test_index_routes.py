@@ -136,3 +136,10 @@ def test_dripactions_untilspring_partial_failure_returns_502_with_message(client
     # Regression: this used to come back as an empty/None message.
     assert body
     assert body.strip() != ""
+
+
+def test_test_cache_routes_are_gone(client, mock_cache):
+    # These debug routes wrote to the shared cache with no auth or rate limit.
+    assert client.get('/drip/set_test_cache').status_code == 404
+    assert client.get('/drip/get_test_cache').status_code == 404
+    mock_cache.set.assert_not_called()
